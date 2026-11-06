@@ -2,14 +2,14 @@
 
 # Fortuna Moda — Sohbetten Kargoya Sipariş Paneli
 
-**WhatsApp ve Instagram DM siparişlerini kontrol edilmiş, gönderime hazır DHL eCommerce kayıtlarına çevirir**
+**WhatsApp ve Instagram DM siparişlerini kontrol edilmiş DHL eCommerce gönderilerine çevirir; etiketler doğrudan panelden basılır**
 
 ![Durum](https://img.shields.io/badge/panel-Ekim%202026'dan%20beri%20canl%C4%B1da-2e7d32)
-![Sürüm](https://img.shields.io/badge/s%C3%BCr%C3%BCm-v1.12.1%20·%2027%20Ekim%202026-455a64)
+![Sürüm](https://img.shields.io/badge/s%C3%BCr%C3%BCm-v1.30.0%20·%204%20Kas%C4%B1m%202026-455a64)
 ![Next.js](https://img.shields.io/badge/Next.js-16-000000?logo=nextdotjs)
 ![TypeScript](https://img.shields.io/badge/TypeScript-strict-3178c6?logo=typescript&logoColor=white)
 ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-4169e1?logo=postgresql&logoColor=white)
-![Vitest](https://img.shields.io/badge/s%C4%B1nav-236%20durum-6e9f18?logo=vitest&logoColor=white)
+![Vitest](https://img.shields.io/badge/s%C4%B1nav-453%20durum-6e9f18?logo=vitest&logoColor=white)
 ![Docker](https://img.shields.io/badge/Docker-GHCR-2496ed?logo=docker&logoColor=white)
 
 Black Wool Project · **Project Lead & Developer** · [English](README.md)
@@ -20,7 +20,8 @@ Black Wool Project · **Project Lead & Developer** · [English](README.md)
 
 > **Bu depo hakkında.** Black Wool'da, siparişlerini WhatsApp ve Instagram sohbetlerinden alan giyim
 > markası **Fortuna Moda** için geliştirildi. Kaynak kodu gizli; bu bir vaka çalışmasıdır. Ekran
-> görüntüleri 28 Ekim 2026'da canlı panelden çekildi; müşteri adları kapatıldı.
+> görüntüleri 28 Ekim 2026'da canlı panelden çekildi (v1.12); ana ekranlar 4 Kasım 2026'da yenilendi.
+> Müşteri adları kapatıldı.
 
 ---
 
@@ -31,10 +32,10 @@ Black Wool Project · **Project Lead & Developer** · [English](README.md)
 | **Müşteri** | Fortuna Moda — WhatsApp ve Instagram DM'den satış yapan, kapıda ödemeli giyim markası |
 | **Akış** | Sohbeti yapıştır ya da ekran görüntüsü bırak → alanlar okunur → işletme kontrol edip onaylar → DHL kaydı ve etiket |
 | **Okuma doğruluğu** | 24 sohbetlik ölçüm setinde model okuyucuyla ad, adres ve tutar 24/24; bütün okuyucularda **0 "yanlış ama kesin"** |
-| **Durum** | Panel Ekim 2026'dan beri kendi sunucusunda canlı (v1.12.1). DHL eCommerce entegrasyonu resmî API tanımından yazıldı; işletmenin kargo hesabı bağlanıyor |
-| **Kod tabanı** | 10 model · ~6.000 satır TypeScript · 36 sınav dosyası / 236 sınav durumu · 215 commit |
+| **Durum** | Panel Ekim 2026'dan beri kendi sunucusunda canlı (v1.30.0). 2 Kasım 2026'dan beri işletmenin gerçek DHL eCommerce hesabına bağlı; ilk gerçek siparişler gönderildi ve etiketleri dükkânda panelden basıldı |
+| **Kod tabanı** | 11 model · ~12.300 satır TypeScript · 56 sınav dosyası / 453 sınav durumu · ana dalda 464 commit |
 
-<sub>28 Ekim 2026'da depodan ve canlı panelden ölçüldü. Ölçüm seti uydurma sohbetlerden oluşuyor, gerçek müşterilerden değil.</sub>
+<sub>Kod tabanı sayıları 6 Kasım 2026'da depodan ölçüldü (ilk yayın 28 Ekim: v1.12.1, 236 sınav). Ölçüm seti uydurma sohbetlerden oluşuyor, gerçek müşterilerden değil.</sub>
 
 ---
 
@@ -55,9 +56,13 @@ uydurma ve gönderi açılmadan önce şüpheli her alanı gözden kaçırılama
 | **Metinden yeni sipariş** | WhatsApp'tan kopyalanan mesajları yapıştır (iPhone ve Android biçimleri, çok satırlı mesajlar); metin mesajlara ayrılır, her mesajın göndereni bulunur |
 | **Ekran görüntüsünden yeni sipariş** | Bir ya da birkaç sohbet görüntüsü bırak; metin yerel bir OCR modeliyle çıkarılır ve aynı okuma hattından geçer |
 | **Kontrol ve onay** | Her alan *kesin* ya da *kontrol edin* diye gösterilir; işletme düzeltir ve onaylar — insan onayı olmadan hiçbir şey kargoya gitmez |
-| **Gönderi** | İki adımda DHL eCommerce kaydı ve etiket (sipariş → barkod), etiket indirme, durum çizelgesi |
-| **Siparişler ve özet** | Durum halkası (onay bekleyen, kargoya hazır, yolda, hata), 14 günlük küçük grafikler; ad, telefon, sipariş no ya da ilçeyle arama; ciro kapıda tahsilat toplamı |
-| **Ürünler** | Ürün ve beden/renk listesi istendiğinde markanın kendi sitesinden, siteyi yormadan — sırayla ve aralarında bekleyerek — aktarılır |
+| **Gönderi** | Onay siparişi saniyeler içinde DHL'e aktarır; barkod ve etiket iki dakika sonra arka planda, yeniden denemeyle istenir. Etiket önizlemesi, durum çizelgesi, saatlik DHL durum okuyucu |
+| **Yazdırma** | Etiketler QZ Tray ile doğrudan dükkânın termal yazıcısına gider — tek tek ya da toplu, "basıldı" takibiyle, yazdırma penceresi açılmadan. Yazıcının yazı tipinin basamadığı harfler (İ, Ğ, Ş) etikette çevrilir |
+| **Siparişler ve özet** | Kartları aynı zamanda süzgeç olan tek durum şeridi, 14 günlük çubuk grafikler, kapıda tahsilat toplamları; ad, telefon, ürün, beden, tutar, adres ve sipariş no'da arama |
+| **Müşteriler** | Her müşterinin sipariş sayısı, toplamı ve son siparişi; tek dokunuşla bütün siparişleri ürünleriyle |
+| **Raporlar** | On rapor bölümü (ürünler, bedenler, yerler, zaman, müşteriler, kanal, sepet, kargo, durum, kâr); her biri Excel olarak indirilebilir |
+| **Ürünler ve kâr** | Ürün ve beden/renk listesi istendiğinde markanın kendi sitesinden, siteyi yormadan — sırayla ve aralarında bekleyerek — aktarılır; ürün görselleri; maliyet girişi ve sipariş başına kâr |
+| **Birden çok işletme** | Tek hesap birden fazla işletmede çalışıp aralarında geçiş yapabilir; her işletme yalnız kendi verisini görür |
 
 ---
 
@@ -135,7 +140,25 @@ parolayı doğrulamak için kullanılamıyor. Parolalar Node'un yerleşik scrypt
 DHL istemcisinin tek bir arayüz arkasında birbirinin yerine geçebilen üç uygulaması var: `fake`
 (DHL'e hiç gitmez), `sandbox` ve `live`. Anahtar, parola ve belirteçler hata mesajına ya da kayda hiç
 yazılmıyor. Sistemin geri kalanı hangisiyle konuştuğunu bilmiyor — panel bu sayede kargo hesabı
-bağlanmadan canlıya çıkıp uçtan uca sınanabildi.
+bağlanmadan canlıya çıkıp uçtan uca sınanabildi. 2 Kasım 2026'da gerçek hesaba geçmek bir kod
+değişikliği değil, bir ayar değişikliği oldu.
+
+### 6. Onay kargoyu beklememeli
+
+Başta sipariş onayı, DHL'in hem kaydı hem barkodu oluşturmasını bekliyordu. DHL barkodu bazen
+dakikalar sonra veriyor ya da yedek barkod dönüyor; düğme takılı kalabiliyordu. Artık onay yalnız
+siparişi aktarıp saniyeler içinde bitiyor; arka plandaki bir iş etiketi iki dakika sonra istiyor, beş
+dakikada bir yeniden deniyor, otuz dakikada vazgeçiyor. Zamanlama kuralı kendi sınavları olan saf bir
+fonksiyon — iki dakika dolmadan "şimdi iste" derse düşen bir kalibrasyon sınavı da dahil.
+
+### 7. İşletme ayrımı yalnız kodda değil, veritabanında
+
+İşletme verisi tutan her tablo PostgreSQL satır düzeyi güvenliğiyle (row-level security) korunuyor:
+uygulamanın veritabanı rolü yalnız o isteğin işletmesine ait satırları görüyor. İşletme belirtilmemişse
+**hiçbir satır görünmüyor** — hata durumu "boş", "her şey" değil. Sınavlar bir işletmenin ötekinin
+siparişini okuyamadığını, yazamadığını ve değiştiremediğini; bir kalibrasyon sınavı da uygulama rolünün
+üyelik tablosunu doğrudan okuyamadığını denetliyor. Tek hesabın iki işletme arasında geçişini güvenli
+kılan bu.
 
 ---
 
@@ -143,10 +166,10 @@ bağlanmadan canlıya çıkıp uçtan uca sınanabildi.
 
 | Katman | Teknoloji |
 |---|---|
-| Uygulama | Next.js 16, React 19, TypeScript (strict), Prisma ORM 7, PostgreSQL, Zod 4 |
+| Uygulama | Next.js 16, React 19, TypeScript (strict), Prisma ORM 7, satır düzeyi güvenlikli PostgreSQL, Zod 4 |
 | Okuma | Kurallı okuyucu, model okuyucu (HTTP üzerinden sınıflandırıcı, SDK yok), yerel model dosyalı tesseract.js OCR |
-| Kargo | DHL eCommerce (MNG ApiZone) REST istemcisi: belirteç → createOrder → createbarcode |
-| Kalite | Vitest — 36 sınav dosyası, 236 durum; her birleşmede imaj derlenmeden önce `tsc --noEmit` ile birlikte çalışır |
+| Kargo ve yazdırma | DHL eCommerce (MNG ApiZone) REST istemcisi: belirteç → createOrder → createbarcode, arka planda etiket işi · RSA-SHA512 imzalı isteklerle QZ Tray |
+| Kalite | Vitest — 56 sınav dosyası, 453 durum; her birleşmede imaj derlenmeden önce `tsc --noEmit` ile birlikte çalışır |
 | Dağıtım | Docker, GitHub Actions → GHCR, Linux sunucuda kendi konteynerleri, Cloudflare Tunnel |
 
 ---
@@ -154,8 +177,9 @@ bağlanmadan canlıya çıkıp uçtan uca sınanabildi.
 ## Rolüm
 
 Projeyi Black Wool adına, marka sahibi ilk kullanıcı olacak şekilde yönettim: sipariş akışı ve
-güvenlik kuralları, okuma hattı ve ölçüm seti, resmî API tanımından DHL entegrasyonu, panel ve
-dağıtım.
+güvenlik kuralları, okuma hattı ve ölçüm seti, resmî API tanımından DHL entegrasyonu, dükkânda
+etiket basımı, panel ve dağıtım. Her sürüm ancak benim açık onayımla canlıya çıkıyor ve geri alma
+adımıyla birlikte bir GitHub sürümü olarak kaydediliyor.
 
 ## Bu depoda olmayanlar
 
